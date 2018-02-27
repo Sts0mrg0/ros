@@ -129,7 +129,7 @@ class _XMLTestResult(unittest.TextTestResult):
     """
 
     def __init__(self, classname, stream=None):
-        unittest.TextTestResult.__init__(self, stream, 1, 1)
+        unittest.TextTestResult.__init__(self, stream, descriptions=1, verbosity=0)
         self._test_name = classname
         self._start_time = None
         self._tests = []
