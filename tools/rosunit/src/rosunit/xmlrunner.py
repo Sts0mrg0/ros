@@ -219,6 +219,13 @@ class _XMLTestResult(unittest.TestResult):
         for info in self._tests:
             info.print_report_text(stream)
 
+class Tee(object):
+    def __init__(self, stream1, stream2):
+        self.stream1 = stream1
+        self.stream2 = stream2
+    def write(self, data):
+        self.stream1.write(data)
+        self.stream2.write(data)
 
 class XMLTestRunner(object):
 
@@ -254,17 +261,19 @@ class XMLTestRunner(object):
         # TODO: Python 2.5: Use the with statement
         old_stdout = sys.stdout
         old_stderr = sys.stderr
-        sys.stdout = StringIO()
-        sys.stderr = StringIO()
+        test_stdout = StringIO()
+        test_stderr = StringIO()
+        sys.stdout = Tee(sys.stdout, test_stdout)
+        sys.stderr =  Tee(sys.stderr, test_stderr)
 
         try:
             test(result)
             try:
-                out_s = sys.stdout.getvalue()
+                out_s = test_stdout.getvalue()
             except AttributeError:
                 out_s = ""
             try:
-                err_s = sys.stderr.getvalue()
+                err_s = test_stderr.getvalue()
             except AttributeError:
                 err_s = ""
         finally:
